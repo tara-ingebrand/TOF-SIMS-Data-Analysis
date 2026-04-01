@@ -2,3 +2,8 @@
 
 
 This is my repo. Here is you set up............
+
+
+```bash
+python rum.py
+```
