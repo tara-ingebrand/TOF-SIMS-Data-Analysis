@@ -3,9 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
+
+############## Inputs ##############
+
+
 # Data Configuration - folder path with .txt files of fragment 3D depth profiles
 # See the provided folder for an example of what this should look like.
 folder_path = 'data/Baseline HC Anode'
+
+#Check that folder path exists
 assert os.path.exists(folder_path), (
     f"Directory does not exist!\n"
     f"You asked for: {folder_path}\n"
@@ -18,9 +24,12 @@ assert os.path.exists(folder_path), (
 # Spatial Binning (Averaging voxels to reduce noise and computation time)
 bin_x, bin_y, bin_z = 16, 16, 10
 
+
+############## Load fragment maps ##############
+
+
 # Data loading and volume reconstruction
 image_data = {}
-
 # Iterate through all .txt files in teh specified folder, reconsutrct each fragment's
 # 3D intensity volume, and cache it as a binary (.npy) file for faster future loading.
 # Fragment labels are extracted from filenames and used as keys for storing volumes.
@@ -56,7 +65,10 @@ for filename in os.listdir(folder_path):
 
         image_data[fragment_label] = volume
 
-# Align and stack all fragment volumes into a 4D array [Fragment, X, Y, Z]
+
+############## Stack & Bin Data ##############
+
+
 intensity_names = list(image_data.keys())
 intensity_volumes = np.stack(list(image_data.values()))
 
@@ -64,6 +76,17 @@ intensity_volumes = np.stack(list(image_data.values()))
 # The 3D volumes are reshaped into blocks of size (bin_x, bin_y, bin_z),
 # and the mean intensity is taken within each block
 n_frag, x, y, z = intensity_volumes.shape
+
+# Check that the bin sizes evenly divide the data
+if (x % bin_x != 0) or (y % bin_y != 0) or (z % bin_z != 0):
+    raise ValueError(
+        f"Invalid bin size!\n"
+        f"Your data dimensions are: x={x}, y={y}, z={z}\n"
+        f"Your chosen bin sizes are: bin_x={bin_x}, bin_y={bin_y}, bin_z={bin_z}\n"
+        f"Each bin size must evenly divide the corresponding data dimension.\n"
+        f"Please choose bin sizes that are factors of the data dimensions."
+    )
+
 binned_data = intensity_volumes.reshape(
     n_frag,
     x // bin_x, bin_x, # splits the x dimension into "x / bin_x" bins of size "bin_x"
@@ -79,7 +102,10 @@ new_x, new_y, new_z = binned_data.shape[1:]
 # Rows = voxels (samples), Columns = chemical fragments (features)
 flattened_data = np.reshape(binned_data, (n_frag, -1)).T
 
-# PCA
+
+############## Apply PCA & Print Summary ##############
+
+
 pca = PCA(n_components=2, random_state=42)
 pc_scores = pca.fit_transform(flattened_data)
 
@@ -104,7 +130,10 @@ for i, component in enumerate(loadings):
 
 print("=" * 60 + "\n")
 
-# Plot Results
+
+############## Plot ##############
+
+
 _, _, Z = np.meshgrid(np.arange(new_x), np.arange(new_y), np.arange(new_z), indexing='ij')
 z_flat = Z.flatten().astype(float)
 

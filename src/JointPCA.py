@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 
 
-############## Inputs #######################################################################
+############## Inputs ##############
+
 # Folder paths containing TOF-SIMS 3D depth profile for each fragment
 folder_paths = [
     '../data/TOF-SIMS/TOF-SIMS Methods Paper/Karlas Crossover Data/3D Fragment Maps/to 300 depth/Gr',
@@ -21,20 +22,23 @@ sample_names = [
 ]
 #colors for each sample centroid & ellipse
 centroid_colors = ['tab:blue', 'tab:red', 'tab:green']
-#################################################################################################
+
 
 assert len(folder_paths) == len(sample_names), f"You should have the same number of sample names and folder paths. Got {len(folder_paths)=} and {len(sample_names)=}"
-
-
 
 # number of bins in x,y,z directions
 bx, by, bz = 16, 16, 10
 
-# ---- Load all samples and unify shapes ----
+
+############## Load fragment maps and bin data ##############
+
+
 all_samples_data = []
 intensity_names = None
 
-
+# Iterate through all .txt files in teh specified folder, reconsutrct each fragment's
+# 3D intensity volume, and cache it as a binary (.npy) file for faster future loading.
+# Fragment labels are extracted from filenames and used as keys for storing volumes.
 for folder_path in folder_paths:
     sample_data = {}
     for filename in os.listdir(folder_path):
@@ -67,7 +71,15 @@ for folder_path in folder_paths:
 
     # bin
     x, y, z = values.shape[1:]
-    assert x % bx == 0 and y % by == 0 and z % bz == 0
+    # Check that the bin sizes evenly divide the data
+    if (x % bx != 0) or (y % by != 0) or (z % bz != 0):
+        raise ValueError(
+            f"Invalid bin size!\n"
+            f"Your data dimensions are: x={x}, y={y}, z={z}\n"
+            f"Your chosen bin sizes are: bx={bx}, by={by}, bz={bz}\n"
+            f"Each bin size must evenly divide the corresponding data dimension.\n"
+            f"Please choose bin sizes that are factors of the data dimensions."
+        )
     new_x, new_y, new_z = x // bx, y // by, z // bz
 
     values = values.reshape(values.shape[0], x//bx, bx, y//by, by, z//bz, bz).mean(axis=(2,4,6))
@@ -79,7 +91,10 @@ for folder_path in folder_paths:
 # ---- Combine all points from all samples for PCA ----
 combined_data = np.concatenate(all_samples_data, axis=1).T  # shape: (total_points, channels)
 
-# ---- Fit PCA ----
+
+############## Apply PCA & Print Summary ##############
+
+
 pca = PCA(n_components=2, random_state=42)
 pca_scores = pca.fit_transform(combined_data)  # shape: (total_points, 2)
 
@@ -134,7 +149,9 @@ x_min, x_max = np.min(np.concatenate(all_scores_x)), np.max(np.concatenate(all_s
 y_min, y_max = np.min(np.concatenate(all_scores_y)), np.max(np.concatenate(all_scores_y))
 
 
-# ---- Plot each sample using the common PCs ----
+############## Plot each sample using the common principal components ##############
+
+
 start = 0
 for i, sample_values in enumerate(all_samples_data):
     n_points = sample_values.shape[1]
@@ -176,7 +193,9 @@ for i, sample_values in enumerate(all_samples_data):
     plt.show()
 
 
-# Plot centroid of PCA scores
+############## Plot centroids of each sample's PC scores ##############
+
+
 fig, ax = plt.subplots()
 for i, centroid in enumerate(centroids):
     ax.scatter(centroid[0], centroid[1], c=centroid_colors[i], s=100, marker='X')

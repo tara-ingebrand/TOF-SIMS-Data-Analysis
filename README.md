@@ -28,7 +28,7 @@ venv\Scripts\Activate.ps1
 ```
 5. Install packages (list ALL packages here)
 ```commandline
-pip install numpy matplotlib scikit-learn 
+pip install numpy matplotlib scikit-learn umap-learn
 ```
 
 # Examples 
@@ -45,6 +45,22 @@ across multiple samples.
 Centroid locations and confidence ellipse geometries provide a summary
 of average interphase composition and chemical heterogeneity. 
 ![Alt text](images/JointPCA.png)
+
+### Run instructions
+
+```commandline
+python .\src\JointPCA.py
+```
+
+The script prints the principal component loadings and explained variance 
+to the terminal as it runs.
+
+To analyze your own data, modify JointPCA.py.
+Set `folder_paths` to the directories containing 
+your 3D TOF-SIMS depth profile `.txt` files.  
+
+When preparing input data, ensure that each sample uses the same set of fragments
+and that all 3D depth profiles are aligned to the same depth for a fair comparison. 
 
 ---
 ## Individual Principal Component Analysis (PCA)
@@ -64,7 +80,7 @@ The script prints the principal component loadings and explained variance
 to the terminal as it runs.
 
 To analyze your own data, modify SinglePCA.py.
-Set `folder_path` (line 7) to the directory containing 
+Set `folder_path` to the directory containing 
 your 3D TOF-SIMS depth profile `.txt` files.  
 
 When preparing input data, consider the depth range included in the 3D profiles.
@@ -73,6 +89,43 @@ dataset spans an equivalent z-depth to maintain consistency.
 
 ---
 ## UMAP and t-SNE
+This script processes 3D TOF-SIMS fragment depth profiles and applies PCA to 
+reveal nonlinear trends such as local clustering and finer chemical heterogeneities.
+
+![Alt text](images/TSNEandUMAP.png)
+
+### Run instructions
+
+```commandline
+python .\src\TSNEandUMAP.py
+```
+Set analysis method (TSNE or UMAP) with `method`
+
+To analyze your own data, modify TSNEandUMAP.py.
+Set `folder_path` (line 12) to the directory containing 
+your 3D TOF-SIMS depth profile `.txt` files.  
+
+---
+
+## Interphase Thickness PCA
+This analysis requires two scripts:
+1. FragmentThicknessMaps.py
+   1. This script takes the 3D depth profile of a fragment as input and outputs a fragment thickness map
+2. FragmentThicknessPCA.py
+   1. This script takes fragment thickness maps of several fragments as input and outputs PCA summary
 
 
+### 1. Fragment Thickness Maps
+![Alt text](images/FragmentThicknessMaps.png)
+### Run instructions
+
+```commandline
+python .\src\FragmentThicknessMaps.py
+```
+To analyze your data, set `folder_path` to the directory containing 
+your 3D TOF-SIMS depth profile `.txt` files. Update `selected_label` with the 
+fragment you would like to analyze. 
+
+---
 - Add citation at the end somehow
+- maybe also need to cite my own fiures once the paper is published? 
