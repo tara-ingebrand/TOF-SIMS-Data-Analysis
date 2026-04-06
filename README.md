@@ -9,7 +9,7 @@ Below are installation instructions and examples of how to use the codebase.
 
 **Link to Manuscript:** Update once paper is published!
 
-**To Cite:** Ingebrand, T. and Manthiram, A. Unveiling Hidden Patterns in 
+**If you find this helpful, please cite:** Ingebrand, T. and Manthiram, A. Unveiling Hidden Patterns in 
 Electrode-electrolyte Interphase Chemistry and Architecture Through
 TOF-SIMS and Machine Learning. *Manuscript in Preparation.*
 
@@ -23,8 +23,8 @@ Below are command line instructions to help get you started. These commands
 are designed to work on a Windows machine, the commands may vary slightly on other 
 operating systems. 
 
-Chatgpt/other LLMs are your best friend - if you have any issues getting this to work, ask an LLM for help.
-
+If you are unfamiliar with coding, there are a lot of internet resources
+or large language models that can help. 
 
 1. Install python
 2. Download the repo
