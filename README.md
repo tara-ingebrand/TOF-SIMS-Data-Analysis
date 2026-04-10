@@ -51,10 +51,9 @@ pip install numpy matplotlib scikit-learn umap-learn
 
 
 ### Example Data Setup
-1. Download data from _________
-2. Create a folder named `data` in the root of the repository (`TOF-SIMS-Data-Analysis`).
+1. Create a folder named `data` in the root of the repository (`TOF-SIMS-Data-Analysis`).
    1. `data/` is added to `.gitignore` so that GIT does not attempt to track or upload the files, which are too large for Github.
-3. Inside the `data` folder, ensure that each sample has a folder that contains its depth profiles.
+2. Inside the `data` folder, ensure that each sample has a folder that contains its depth profiles.
 
 ---
 
